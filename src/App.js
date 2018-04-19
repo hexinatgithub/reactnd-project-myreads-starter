@@ -25,20 +25,36 @@ class BooksApp extends React.Component {
     this.state.books.filter(book => book.shelf === shelf)
   )
 
+  updateBookExist = (book, shelf) => {
+    this.setState(prevState => {
+      const books = prevState.books
+        .map(prevBook => {
+          if (prevBook.id === book.id) {
+            prevBook.shelf = shelf;
+          }
+          return prevBook;
+        })
+        .filter(book => book !== 'none');
+      return { books };
+    });
+  }
+
+  updateBookNotExist = (book, shelf) => {
+    book.shelf = shelf;
+    this.setState(prevState => (
+      { books: prevState.books.concat([book]) }
+    ));
+  }
+
   updateBook = (book, shelf) => {
     BooksAPI.update(book, shelf)
-      .then(() => (
-        this.setState(prevState => (
-          {
-            books: prevState.books.map(prevBook => {
-              if (prevBook.id === book.id) {
-                prevBook.shelf = shelf;
-              }
-              return prevBook;
-            })
-          }
-        ))
-      ));
+      .then(() => {
+        const bookNotExist = this.state.books.findIndex(tempBook => tempBook.id === book.id) === -1;
+        if (bookNotExist)
+          this.updateBookNotExist(book, shelf);
+        else
+          this.updateBookExist(book, shelf);
+      });
   }
 
   render() {
@@ -47,9 +63,11 @@ class BooksApp extends React.Component {
     const read = this.getShelfBooks('read');
 
     return (
-      <div className="app">
+      <div className="app" >
         <Route path="/search" render={() => (
-          <SearchPage />
+          <SearchPage
+            onUpdateBook={this.updateBook}
+          />
         )} />
         <Route exact path="/" render={() => (
           <div className="list-books">
