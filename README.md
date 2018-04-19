@@ -4,7 +4,7 @@ This is the starter template for the final assessment project for Udacity's Reac
 
 Of course, you are free to start this project from scratch if you wish! Just be sure to use [Create React App](https://github.com/facebookincubator/create-react-app) to bootstrap the project.
 
-## TL;DR
+## How to get start
 
 To get started developing right away:
 
@@ -34,6 +34,13 @@ To get started developing right away:
 ```
 
 Remember that good React design practice is to create new JS files for each component and use import/require statements to include them where they are needed.
+
+## Front end
+[App.js](./src/App.js) contain is the root of your app, it use Route to render different page base on the url. It manage its own state, include `books` that user is added to the shelf, and use `BooksAPI.js` to update its state after result is fetched.
+
+[Book.jsx](./src/Book.jsx) contain the Book component return proper HTML and has some props action called when some event happen. When user change the book shelf Book call `onUpdateBook` action.
+
+[SearchPage.jsx](./src/SearchPage.jsx) render the search Page and contain a Link back to main page. Call `onUpdateBook` action when the search result Book change the shelf property and should pass a `shelfBooks` array to find out some book is already in user's shelf and get some data from it.
 
 ## Backend Server
 

@@ -1,9 +1,16 @@
 import React, { Component } from 'react';
 import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
 import Book from "./Book";
 import * as BooksAPI from './BooksAPI';
 
 class SearchPage extends Component {
+
+  static propTypes = {
+    shelfBooks: PropTypes.array,
+    onUpdateBook: PropTypes.func
+  }
+
   constructor(props) {
     super(props);
     this.state = {
@@ -12,11 +19,28 @@ class SearchPage extends Component {
   }
 
   queryBooks = query => {
-    BooksAPI.search(query)
-      .then(books => (
-        this.setState({ searchResults: books })
-      ))
-      .catch(e => this.setState({ searchResults: [] }));
+    if (query) {
+      BooksAPI.search(query)
+        .then(data => {
+          if (data.error) {
+            throw data;
+          }
+
+          // if book exist in the shelf, get shelf property
+          // book state should syn between app and search page
+          return data.map(book => {
+            const i = this.props.shelfBooks.findIndex(shelfBook => shelfBook.id === book.id);
+            book.shelf = i !== -1 ? this.props.shelfBooks[i].shelf : "none";
+            return book;
+          });
+        })
+        // update the searchResults
+        .then(books => this.setState({ searchResults: books }))
+        // reset searchResults to empty array if error throw
+        .catch(() => this.setState({ searchResults: [] }));
+    } else {
+      this.setState({ searchResults: [] })
+    }
   }
 
   render() {
